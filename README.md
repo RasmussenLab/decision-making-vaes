@@ -18,6 +18,12 @@ cd decision-making-vaes
 python setup.py install
 ```
 
+or using anaconda
+
+```
+conda create -n decision_making_vaes -c pytorch -c defaults numpy pytorch torchvision matplotlib scikit-learn pandas tqdm statsmodels arviz
+```
+
 ## Run experiments
 
 - To run the pPCA experiment, run `python simu_ppca.py`
