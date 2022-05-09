@@ -7,9 +7,12 @@ import torch.nn as nn
 # from torch.distributions import MultivariateNormal, Normal
 import torch.distributions as db
 
+import dmvaes
 from dmvaes.models.distributions import EllipticalStudent
 
 logger = logging.getLogger(__name__)
+
+DEVICE = dmvaes.get_device()
 
 
 class FCLayersA(nn.Module):
@@ -104,7 +107,7 @@ class EncoderB(nn.Module):
     def __init__(
         self, n_input, n_output, n_hidden, dropout_rate, do_batch_norm, n_middle=None
     ):
-        # TODO: describe architecture and choice for people 
+        # TODO: describe architecture and choice for people
         super().__init__()
         logging.info("Using MF encoder with convolutions")
         self.encoder_cv = nn.Sequential(
@@ -257,7 +260,7 @@ class EncoderAStudent(nn.Module):
             df_use = torch.clamp(df_use, max=1e5)
             return df_use
         else:
-            return torch.tensor(self.df_val, device="cuda")
+            return torch.tensor(self.df_val, device=DEVICE)
 
     def reparameterize(self, dist, sample_shape=torch.Size(), reparam=True):
         if reparam:
@@ -540,8 +543,8 @@ class EncoderIAF(nn.Module):
             )
 
         self.dist0 = db.Normal(
-            loc=torch.zeros(n_latent, device="cuda"),
-            scale=torch.ones(n_latent, device="cuda"),
+            loc=torch.zeros(n_latent, device=DEVICE),
+            scale=torch.ones(n_latent, device=DEVICE),
         )
 
     def forward(self, x, *cat_list: int, n_samples=1, reparam=True):

@@ -8,6 +8,10 @@ from tqdm.auto import tqdm
 from .hmc import accept_reject, hmc_trajectory
 from .utils import log_normal, safe_repeat
 
+import dmvaes
+
+DEVICE = dmvaes.get_device()
+
 
 def ais_trajectory(
     model,
@@ -37,7 +41,7 @@ def ais_trajectory(
     model = model.eval()
 
     prior_distribution = torch.distributions.Normal(
-        torch.zeros(n_latent, device="cuda"), torch.ones(n_latent, device="cuda")
+        torch.zeros(n_latent, device=DEVICE), torch.ones(n_latent, device=DEVICE)
     )
 
     def log_f_i(z, data, t):
@@ -142,7 +146,7 @@ def ais_trajectory_sample(
     model = model.eval()
 
     prior_distribution = torch.distributions.Normal(
-        torch.zeros(n_latent, device="cuda"), torch.ones(n_latent, device="cuda")
+        torch.zeros(n_latent, device=DEVICE), torch.ones(n_latent, device=DEVICE)
     )
 
     def log_f_i(z, data, t):

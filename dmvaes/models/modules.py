@@ -8,10 +8,13 @@ import torch.distributions as dist
 from torch import nn as nn
 from torch.distributions import Normal
 
+import dmvaes
 from dmvaes.models.utils import one_hot
 from dmvaes.models.distributions import EllipticalStudent
 
 logger = logging.getLogger(__name__)
+
+DEVICE = dmvaes.get_device()
 
 
 class FCLayers(nn.Module):
@@ -270,7 +273,7 @@ class EncoderStudent(nn.Module):
             df_use = torch.clamp(df_use, max=1e5)
             return df_use
         else:
-            return torch.tensor(self.df_val, device="cuda")
+            return torch.tensor(self.df_val, device=DEVICE)
 
     def reparameterize(self, dist, reparam=True):
         if reparam:
@@ -630,8 +633,8 @@ class EncoderIAF(nn.Module):
             )
 
         self.dist0 = dist.Normal(
-            loc=torch.zeros(n_latent, device="cuda"),
-            scale=torch.ones(n_latent, device="cuda"),
+            loc=torch.zeros(n_latent, device=DEVICE),
+            scale=torch.ones(n_latent, device=DEVICE),
         )
 
     def forward(self, x, *cat_list: int, n_samples=1, reparam=True):

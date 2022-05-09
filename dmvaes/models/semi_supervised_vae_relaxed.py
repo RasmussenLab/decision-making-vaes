@@ -21,6 +21,10 @@ from dmvaes.models.regular_modules import (
     EncoderBStudent,
 )
 
+import dmvaes
+
+DEVICE = dmvaes.get_device()
+
 logger = logging.getLogger(__name__)
 
 
@@ -122,7 +126,7 @@ class RelaxedSVAE(nn.Module):
         y_prior_probs = (
             y_prior
             if y_prior is not None
-            else (1 / n_labels) * torch.ones(1, n_labels, device="cuda")
+            else (1 / n_labels) * torch.ones(1, n_labels, device=DEVICE)
         )
 
         self.y_prior = Categorical(probs=y_prior_probs)
@@ -175,7 +179,7 @@ class RelaxedSVAE(nn.Module):
         elif mode == "is":
             pc_x = torch.zeros(n_batch, self.n_labels, device=x.device)
             for c_val in np.arange(self.n_labels):
-                y_val = c_val * torch.ones(n_batch, device="cuda")
+                y_val = c_val * torch.ones(n_batch, device=DEVICE)
                 y_val = y_val.long()
                 outs = self.inference(x, y=y_val, **inference_kwargs)
                 if counts is None:
@@ -229,12 +233,12 @@ class RelaxedSVAE(nn.Module):
         n_latent = self.n_latent
 
         u = Normal(
-            torch.zeros(n_latent, device="cuda"), torch.ones(n_latent, device="cuda"),
+            torch.zeros(n_latent, device=DEVICE), torch.ones(n_latent, device=DEVICE),
         ).sample((n_samples, n_batch))
 
         if y is None:
             ys = OneHotCategorical(
-                probs=(1.0 / n_cat) * torch.ones(n_cat, device="cuda")
+                probs=(1.0 / n_cat) * torch.ones(n_cat, device=DEVICE)
             ).sample((n_samples, n_batch))
         else:
             ys = torch.cuda.FloatTensor(n_batch, n_cat)
@@ -472,7 +476,7 @@ class RelaxedSVAE(nn.Module):
             if encoder_key == "prior":
                 log_proba_c = log_proba_c_prior
                 log_qc_all = (1.0 / n_labels) * torch.ones(
-                    n_samples_total, n_batch, n_labels, device="cuda"
+                    n_samples_total, n_batch, n_labels, device=DEVICE
                 )
                 res = res_prior
             else:

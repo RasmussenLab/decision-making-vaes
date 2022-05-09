@@ -7,8 +7,12 @@ from arviz.stats import psislw
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from tqdm.auto import tqdm
 
+import dmvaes
 from dmvaes.dataset import MnistDataset
 
+
+
+DEVICE = dmvaes.get_device()
 
 N_EVAL_SAMPLES = 25
 NUM = 300
@@ -35,8 +39,8 @@ DATASET = MnistDataset(
 )
 X_TRAIN, Y_TRAIN = DATASET.train_dataset.tensors
 RDM_INDICES = np.random.choice(len(X_TRAIN), 200)
-X_SAMPLE = X_TRAIN[RDM_INDICES].to("cuda")
-Y_SAMPLE = Y_TRAIN[RDM_INDICES].to("cuda")
+X_SAMPLE = X_TRAIN[RDM_INDICES].to(DEVICE)
+Y_SAMPLE = Y_TRAIN[RDM_INDICES].to(DEVICE)
 DO_OVERALL = True
 
 

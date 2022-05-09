@@ -10,7 +10,9 @@ from torch.optim import Adam
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
+import dmvaes
 from dmvaes.dataset import MnistDataset
+DEVICE = dmvaes.get_device()
 
 logger = logging.getLogger(__name__)
 
@@ -136,9 +138,9 @@ class MnistRTrainer:
                 x_u, _ = tensor_all
                 x_s, y_s = tensor_superv
 
-                x_u = x_u.to("cuda")
-                x_s = x_s.to("cuda")
-                y_s = y_s.to("cuda")
+                x_u = x_u.to(DEVICE)
+                x_s = x_s.to(DEVICE)
+                y_s = y_s.to(DEVICE)
 
                 if overall_loss is not None:
                     loss = self.loss(
@@ -272,9 +274,9 @@ class MnistRTrainer:
                 x_u, _ = tensor_all
                 x_s, y_s = tensor_superv
 
-                x_u = x_u.to("cuda")
-                x_s = x_s.to("cuda")
-                y_s = y_s.to("cuda")
+                x_u = x_u.to(DEVICE)
+                x_s = x_s.to(DEVICE)
+                y_s = y_s.to(DEVICE)
 
                 # Wake phi
                 for key in encoder_keys:
@@ -343,9 +345,9 @@ class MnistRTrainer:
                 x_u, _ = tensor_all
                 x_s, y_s = tensor_superv
 
-                x_u = x_u.to("cuda")
-                x_s = x_s.to("cuda")
-                y_s = y_s.to("cuda")
+                x_u = x_u.to(DEVICE)
+                x_s = x_s.to(DEVICE)
+                y_s = y_s.to(DEVICE)
 
                 # Wake theta
                 theta_loss = self.loss(
@@ -497,8 +499,8 @@ class MnistRTrainer:
             self.model = self.model.train()
         for tensor_all in data_loader:
             x, y = tensor_all
-            x = x.to("cuda")
-            y = y.to("cuda")
+            x = x.to(DEVICE)
+            y = y.to(DEVICE)
             if not do_supervised:
                 res = self.model.inference(
                     x,

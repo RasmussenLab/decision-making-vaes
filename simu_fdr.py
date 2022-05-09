@@ -16,9 +16,11 @@ import torch.distributions as db
 from torch import nn
 from arviz.stats import psislw
 
+import dmvaes
 from dmvaes.ais import ais_trajectory
 from dmvaes.dataset import GeneExpressionDataset
 
+DEVICE = dmvaes.get_device()
 
 NUMS = 5
 N_PICKS = 30
@@ -118,9 +120,9 @@ DATASET = GeneExpressionDataset(
 
 SAMPLE_IDX = np.random.choice(N_CELLS, 64)
 Y = labels
-X_U = torch.tensor(DATASET.X[SAMPLE_IDX]).to("cuda")
-LOCAL_L_MEAN = torch.tensor(DATASET.local_vars[SAMPLE_IDX]).to("cuda")
-LOCAL_L_VAR = torch.tensor(DATASET.local_means[SAMPLE_IDX]).to("cuda")
+X_U = torch.tensor(DATASET.X[SAMPLE_IDX]).to(DEVICE)
+LOCAL_L_MEAN = torch.tensor(DATASET.local_vars[SAMPLE_IDX]).to(DEVICE)
+LOCAL_L_VAR = torch.tensor(DATASET.local_means[SAMPLE_IDX]).to(DEVICE)
 N_GENES = n_genes
 
 
@@ -249,7 +251,7 @@ def get_predictions_ais(post_a, post_b, model, schedule, n_latent, n_post_sample
             model.decoder(
                 model.dispersion,
                 z_a.cuda(),
-                torch.ones(len(z_a), n_batch, 1, device="cuda"),
+                torch.ones(len(z_a), n_batch, 1, device=DEVICE),
                 None,
             )[0]
             .log2()
@@ -273,7 +275,7 @@ def get_predictions_ais(post_a, post_b, model, schedule, n_latent, n_post_sample
             model.decoder(
                 model.dispersion,
                 z_b.cuda(),
-                torch.ones(len(z_b), n_batch, 1, device="cuda"),
+                torch.ones(len(z_b), n_batch, 1, device=DEVICE),
                 None,
             )[0]
             .log2()
@@ -988,7 +990,7 @@ for scenario in SCENARIOS:
                             REVKL=Encoder(**hparams),
                             CUBO=EncoderStudent(df="learn", **hparams),
                         )
-                        eval_encoder = nn.ModuleDict(encs).to("cuda")
+                        eval_encoder = nn.ModuleDict(encs).to(DEVICE)
                         counts_eval = COUNTS_EVAL
                         if os.path.exists(eval_enc_name):
                             print("eval enc mdl exists; loading from .pt")
@@ -1024,7 +1026,7 @@ for scenario in SCENARIOS:
                                         do_h=True,
                                     )
                                 }
-                            ).to("cuda")
+                            ).to(DEVICE)
 
                         elif encoder_variant == "student":
                             eval_encoder = nn.ModuleDict(
@@ -1039,7 +1041,7 @@ for scenario in SCENARIOS:
                                         dropout_rate=0.1,
                                     )
                                 }
-                            ).to("cuda")
+                            ).to(DEVICE)
 
                         else:
                             eval_encoder = nn.ModuleDict(
@@ -1053,7 +1055,7 @@ for scenario in SCENARIOS:
                                         dropout_rate=0.1,
                                     )
                                 }
-                            ).to("cuda")
+                            ).to(DEVICE)
 
                         counts_eval = None
                         if os.path.exists(eval_enc_name):

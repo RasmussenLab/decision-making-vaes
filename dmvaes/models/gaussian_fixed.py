@@ -10,10 +10,13 @@ import torch.nn as nn
 from scipy.linalg import sqrtm
 from torch.distributions import MultivariateNormal, Normal
 
+import dmvaes
 from dmvaes.models.modules import Encoder, EncoderStudent
 from dmvaes.models.regular_modules import LinearEncoder
 
 torch.backends.cudnn.benchmark = True
+
+DEVICE = dmvaes.get_device()
 
 
 class LinearGaussianDefensive(nn.Module):
@@ -330,7 +333,7 @@ class LinearGaussianDefensive(nn.Module):
         """
         n_latent = z.shape[-1]
         z_prior = Normal(
-            torch.zeros(n_latent, device="cuda"), torch.ones(n_latent, device="cuda")
+            torch.zeros(n_latent, device=DEVICE), torch.ones(n_latent, device=DEVICE)
         )
         log_pz = z_prior.log_prob(z).sum(-1)
 
