@@ -17,6 +17,7 @@ from arviz.stats import psislw
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from tqdm.auto import tqdm
 
+import dmvaes
 from dmvaes.dataset import MnistDataset
 from dmvaes.inference import MnistRTrainer
 from dmvaes.models import RelaxedSVAE
@@ -27,6 +28,7 @@ from dmvaes.models.regular_modules import (
     EncoderAStudent,
     EncoderBStudent,
 )
+from fdr_utils import DEVICE
 from mnist_utils import (
     NUM,
     LABELLED_PROPORTIONS,
@@ -68,6 +70,8 @@ PROJECT_NAME = "mnist-relaxed_nparticules_{}".format(N_PARTICULES)
 FILENAME = "{}.pkl".format(PROJECT_NAME)
 MDL_DIR = "models/{}".format(PROJECT_NAME)
 DEBUG = False
+
+DEVICE = dmvaes.get_device()
 
 if not os.path.exists(MDL_DIR):
     os.makedirs(MDL_DIR)
@@ -209,7 +213,7 @@ for scenario in SCENARIOS:
                 trainer = MnistRTrainer(
                     dataset=DATASET,
                     model=mdl,
-                    use_cuda=True,
+                    use_cuda=True if DEVICE=='cuda' else False,
                     batch_size=batch_size,
                     classify_mode=classify_mode,
                 )

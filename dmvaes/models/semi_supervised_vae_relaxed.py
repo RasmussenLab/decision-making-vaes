@@ -25,6 +25,9 @@ import dmvaes
 
 DEVICE = dmvaes.get_device()
 
+FloatTensor = torch.cuda.FloatTensor if DEVICE=='cuda' else torch.FloatTensor
+IntTensor = torch.cuda.IntTensor if DEVICE=='cuda' else torch.IntTensor
+
 logger = logging.getLogger(__name__)
 
 
@@ -241,7 +244,7 @@ class RelaxedSVAE(nn.Module):
                 probs=(1.0 / n_cat) * torch.ones(n_cat, device=DEVICE)
             ).sample((n_samples, n_batch))
         else:
-            ys = torch.cuda.FloatTensor(n_batch, n_cat)
+            ys = FloatTensor(n_batch, n_cat)
             ys.zero_()
             ys.scatter_(1, y.view(-1, 1), 1)
             ys = ys.view(1, n_batch, n_cat).expand(n_samples, n_batch, n_cat)
@@ -364,7 +367,7 @@ class RelaxedSVAE(nn.Module):
             ys = (ys_probs == ys_probs.max(-1, keepdim=True).values).float()
             y_int = ys.argmax(-1)
         else:
-            ys = torch.cuda.FloatTensor(n_batch, n_cat)
+            ys = FloatTensor(n_batch, n_cat)
             ys.zero_()
             ys.scatter_(1, y.view(-1, 1), 1)
             ys = ys.view(1, n_batch, n_cat).expand(n_samples, n_batch, n_cat)
